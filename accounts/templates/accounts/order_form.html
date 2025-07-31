@@ -1,8 +1,34 @@
 {% extends "accounts/main.html" %}
 {% block content %}
-    <form action="" method='post'>
-        {% csrf_token %}
-        {{form.as_p}}
-        <button type="submit">Submit</button>
-    </form>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ formset.management_form }}  {# Required for formset handling #}
+
+                <table class="table table-sm">
+                    <tr>
+                        <th>Product</th>
+                        <th>Status</th>
+                        <th>Delete</th>
+                    </tr>
+                    {% for form in formset %}
+                    <tr>
+                        <td>{{ form.product }}</td>
+                        <td>{{ form.status }}</td>
+                        <td>
+                            {% if form.DELETE %}
+                                {{ form.DELETE }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+
+                <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock content %}
