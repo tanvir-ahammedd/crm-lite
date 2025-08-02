@@ -1,6 +1,10 @@
 {% extends "accounts/main.html" %}
 
+
 {% block content %}
+    {% for message in messages %}
+        {{message}}
+    {% endfor %}
     {% include "accounts/status.html" %}
     <br>
     <div class="row">
@@ -51,5 +55,4 @@
             </div>
         </div>
     </div>
-
 {% endblock content %}
