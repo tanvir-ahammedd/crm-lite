@@ -1,8 +1,10 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
 class Customer(models.Model):
+	user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
 	name = models.CharField(max_length=200, null=True)
 	phone = models.CharField(max_length=200, null=True)
 	email = models.CharField(max_length=200, null=True)
@@ -11,10 +13,10 @@ class Customer(models.Model):
 	def __str__(self):
 		return self.name
 
-	@property
-	def orders(self):
-		order_count = self.order_set.all().count()
-		return str(order_count)
+	# @property
+	# def orders(self):
+	# 	order_count = self.order_set.all().count()
+	# 	return str(order_count)
 	
 
 

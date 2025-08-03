@@ -40,8 +40,14 @@ def registerPage(request):
         if form.is_valid():
             user = form.save()
             
+            # customer added to the group automatically
             group = Group.objects.get(name='customer')
             user.groups.add(group)
+            
+            # automatically crete object for customer
+            Customer.objects.create(
+                user=user
+            )
             
             if user is not None:
                 login(request, user)
@@ -49,13 +55,36 @@ def registerPage(request):
                 messages.success(request, "Account is created succesfully for " + name)
                 return redirect(home)
             
-    
     context = {'form': form}
     return render(request, 'accounts/register.html', context)
   
 def logoutPage(request):
     logout(request)
     return redirect('login')          
+
+from django.http import HttpResponse
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
+def userPage(request):
+    try:
+        customer = request.user.customer
+        orders = customer.order_set.all()
+        total_orders = orders.count()
+        delivered = orders.filter(status='Delivered').count()
+        pending = orders.filter(status='Pending').count()
+
+        context = {
+            'orders': orders,
+            'delivered': delivered,
+            'pending': pending,
+            'total_orders': total_orders
+        }
+
+        return render(request, 'accounts/user.html', context)
+    
+    except Customer.DoesNotExist:
+        return HttpResponse("No customer profile found for this user.")
 
 @login_required(login_url='login')
 # @allowed_users(allowed_roles=['admin'])
@@ -135,6 +164,3 @@ def deleteOrder(request, pk):
         order.delete()
         return redirect('home')
     return render(request, 'accounts/delete.html', {'order': order})
-
-def userPage(request):
-    return render(request, 'accounts/user.html')
