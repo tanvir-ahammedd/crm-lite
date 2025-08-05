@@ -41,15 +41,6 @@ def registerPage(request):
         if form.is_valid():
             user = form.save()
             
-            # customer added to the group automatically
-            group = Group.objects.get(name='customer')
-            user.groups.add(group)
-            
-            # automatically crete object for customer
-            Customer.objects.create(
-                user=user
-            )
-            
             if user is not None:
                 login(request, user)
                 name = request.POST.get('username')
