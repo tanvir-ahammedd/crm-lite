@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.forms import inlineformset_factory
@@ -8,7 +9,7 @@ from django.contrib.auth.models import Group
 from django.contrib import messages
 
 from .models import *
-from .forms import OrderForm, CreateUserForm
+from .forms import OrderForm, CreateUserForm, CustomerForm
 from .filters import OrderFilter
 from . decorators import unauthenticated_user, allowed_users, admin_only
 
@@ -62,7 +63,6 @@ def logoutPage(request):
     logout(request)
     return redirect('login')          
 
-from django.http import HttpResponse
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['customer'])
@@ -85,6 +85,19 @@ def userPage(request):
     
     except Customer.DoesNotExist:
         return HttpResponse("No customer profile found for this user.")
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
+def accountSettings(request):
+    customer = request.user.customer
+    form = CustomerForm(instance=customer)
+    
+    if request.method == 'POST':
+        form = CustomerForm(request.POST, request.FILES, instance=customer)
+        if form.is_valid():
+            form.save()
+    context = {'form': form}
+    return render(request, 'accounts/account_settings.html', context)
 
 @login_required(login_url='login')
 # @allowed_users(allowed_roles=['admin'])
